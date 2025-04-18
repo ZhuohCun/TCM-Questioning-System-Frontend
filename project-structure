@@ -1,0 +1,31 @@
+my-vue-project/
+├── src/
+│   ├── api/
+│   │   └── index.js        # API 接口配置
+│   ├── assets/
+│   │   ├── logo.png
+│   │   └── styles/
+│   │       └── main.scss   # 全局样式
+│   ├── components/
+│   │   ├── NavBar.vue      # 导航栏组件
+│   │   ├── ChatMessage.vue # 聊天消息组件
+│   │   └── AcupointCard.vue# 穴位卡片组件
+│   ├── views/
+│   │   ├── HomeView.vue    # 系统介绍主页
+│   │   ├── ChatView.vue    # 问答界面
+│   │   ├── LoginView.vue   # 登录界面
+│   │   ├── RegisterView.vue# 注册界面
+│   │   └── AcupointView.vue# 穴位信息展示界面
+│   ├── store/
+│   │   └── index.js        # Vuex配置
+│   ├── router/
+│   │   └── index.js        # 路由配置
+│   ├── utils/
+│   │   └── request.js      # Axios配置
+│   ├── App.vue
+│   └── main.js
+├── .gitignore
+├── index.html
+├── package.json
+├── vite.config.js
+└── README.md 
