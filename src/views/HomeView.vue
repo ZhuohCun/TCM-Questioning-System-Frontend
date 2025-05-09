@@ -44,7 +44,7 @@ npm<template>
           <div class="timeline-item">
             <div class="timeline-point"></div>
             <div class="timeline-content">
-              <span class="date">2024年12月</span>
+              <span class="date">2025年4月</span>
               <h3>穴位查询功能上线</h3>
               <p>新增中医穴位查询功能，提供详细的穴位信息和专业知识库</p>
             </div>
@@ -52,7 +52,7 @@ npm<template>
           <div class="timeline-item">
             <div class="timeline-point"></div>
             <div class="timeline-content">
-              <span class="date">2024年12月</span>
+              <span class="date">2025年3月</span>
               <h3>对话记录保存功能</h3>
               <p>支持自动保存问诊记录，方便用户随时查看历史对话内容</p>
             </div>
@@ -68,7 +68,7 @@ npm<template>
           <div class="timeline-item">
             <div class="timeline-point"></div>
             <div class="timeline-content">
-              <span class="date">2024年10月</span>
+              <span class="date">2024年11月</span>
               <h3>项目启动</h3>
               <p>中医针灸问答系统前后端正式开启</p>
             </div>
@@ -89,6 +89,7 @@ npm<template>
               <li>针灸治疗应在专业中医师指导下进行，请勿自行尝试</li>
               <li>如遇紧急情况，请立即就医</li>
             </ul>
+            <div class="kaisha">株式会社　ティーシーエム</div>
           </div>
         </div>
       </div>
@@ -353,6 +354,11 @@ h1 {
   line-height: 1.6;
   margin: 0;
 }
-
+.kaisha{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.83vw;
+}
 
 </style>
