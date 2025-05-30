@@ -1,2 +1,3 @@
-This is a TCM questioning system based on knowledge graph and machine learning
-copyright © all rights reserved
+This is a TCM questioning system based on knowledge graph and machine learning.
+This opensource software is for you all to learn from and redevelop. As it is coded by the members of 「our group」 completely, any illegal use of this copy is strictly prohibited. 
+Copyright © All Rights Reserved
