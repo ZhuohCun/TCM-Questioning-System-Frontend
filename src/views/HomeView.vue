@@ -45,7 +45,7 @@ npm<template>
             <div class="timeline-point"></div>
             <div class="timeline-content">
               <span class="date">2025年5月</span>
-              <h3>穴位查询功能优化上线</h3>
+              <h3>穴位查询功能优化</h3>
               <p>优化中医穴位查询功能，提供详细的穴位信息和专业知识库及更好的交互体验</p>
             </div>
           </div>
