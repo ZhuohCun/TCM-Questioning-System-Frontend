@@ -199,50 +199,64 @@ onMounted(() => {
   fetchAllAcupoints()
 })
 function beforeEnter(el) {
-  el.style.maxHeight = '0'
-  el.style.transform = 'scaleY(0.8)'
-  el.style.transformOrigin = 'top'
-  el.style.overflow = 'hidden'
-  el.style.transition = 'none'
+  el.style.maxHeight = '0';
+  el.style.opacity = '0';
+  el.style.transform = 'scaleY(0.95)';
+  el.style.overflow = 'hidden';
+  el.style.willChange = 'max-height, opacity, transform';
+  el.style.transition = 'none';
 }
-
+const TRANSITION_DURATION = '0.1s';
 function enter(el) {
   requestAnimationFrame(() => {
-    el.style.transition = 'max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-    el.style.maxHeight = el.scrollHeight + 50 + 'px' // 多留点空间避免裁剪
-    el.style.transform = 'scaleY(1)'
-  })
+    requestAnimationFrame(() => {
+      el.style.transition = `
+        max-height ${TRANSITION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
+        opacity ${TRANSITION_DURATION} ease-out,
+        transform ${TRANSITION_DURATION} ease-out
+      `;
+      el.style.maxHeight = `${el.scrollHeight}px`;
+      el.style.opacity = '1';
+      el.style.transform = 'scaleY(1)';
+    });
+  });
 }
 
 function afterEnter(el) {
-  el.style.maxHeight = 'none'
-  el.style.overflow = ''
-  el.style.transition = ''
-  el.style.transform = ''
+  el.style.maxHeight = '';
+  el.style.willChange = '';
+  el.style.transition = '';
 }
 
 function beforeLeave(el) {
-  el.style.maxHeight = el.scrollHeight + 'px'
-  el.style.transform = 'scaleY(1)'
-  el.style.transformOrigin = 'top'
-  el.style.overflow = 'hidden'
-  el.style.transition = 'none'
-  el.offsetHeight
+  el.style.maxHeight = `${el.scrollHeight}px`;
+  el.style.opacity = '1';
+  el.style.transform = 'scaleY(1)';
+  el.style.overflow = 'hidden';
+  el.style.willChange = 'max-height, opacity, transform';
 }
 
 function leave(el) {
   requestAnimationFrame(() => {
-    el.style.transition = 'max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-    el.style.maxHeight = '0'
-    el.style.transform = 'scaleY(0.8)'
-  })
+    requestAnimationFrame(() => {
+      el.style.transition = `
+        max-height ${TRANSITION_DURATION} cubic-bezier(0.4, 0, 0.2, 1),
+        opacity ${TRANSITION_DURATION} ease-out,
+        transform ${TRANSITION_DURATION} ease-out
+      `;
+      el.style.maxHeight = '0';
+      el.style.opacity = '0';
+      el.style.transform = 'scaleY(0.95)';
+    });
+  });
 }
 
 function afterLeave(el) {
-  el.style.transition = ''
-  el.style.maxHeight = ''
-  el.style.transform = ''
-  el.style.overflow = ''
+  el.style.maxHeight = '';
+  el.style.opacity = '';
+  el.style.transform = '';
+  el.style.willChange = '';
+  el.style.transition = '';
 }
 </script>
 
