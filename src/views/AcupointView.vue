@@ -33,8 +33,10 @@
             @click="toggleAcupointDetail(acupoint.name)"
         >
           <div class="card-header">
-            <h3>{{ acupoint.name }}</h3>
-            <span>{{ acupoint.meridian_name }}</span>
+            <div class="card-header">
+              <h3>{{ acupoint.name }}</h3>
+              <span class="meridian-tag">{{ acupoint.meridian_name }}</span>
+            </div>
           </div>
           <transition
               @before-enter="beforeEnter"
@@ -51,8 +53,14 @@
                 :ref="el => setDetailRef(el, acupoint.name)"
             >
               <div v-if="acupointDetails[acupoint.name]" class="detail-content">
-                <p>{{ acupointDetails[acupoint.name].location_description }}</p>
-                <p>{{ acupointDetails[acupoint.name].technique }}</p>
+                <div class="detail-item">
+                  <label>位置：</label>
+                  <p>{{ acupointDetails[acupoint.name].location_description }}</p>
+                </div>
+                <div class="detail-item">
+                  <label>操作技术：</label>
+                  <p>{{ acupointDetails[acupoint.name].technique }}</p>
+                </div>
               </div>
               <div v-else class="loading-detail">加载中…</div>
             </div>
@@ -383,9 +391,9 @@ function afterLeave(el) {
     .meridian-tag {
       font-size: 0.68vw;
       color: #666;
-      background: #f5f5f5;
+      background: #eee;
       padding: 0.21vw 0.63vw;
-      border-radius: 0.21vw;
+      border-radius: 0.3vw;
       display: inline-block;
     }
   }
