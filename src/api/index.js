@@ -131,5 +131,14 @@ export const api = {
         authorization: localStorage.getItem('token')
       }
     })
+  },
+  getLoginStatus: () => {
+    return request({
+      url: `${BASE_URL}/user/verify`,
+      method: 'post',
+      headers: {
+        authorization: localStorage.getItem('token')
+      }
+    })
   }
 } 

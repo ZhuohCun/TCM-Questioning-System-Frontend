@@ -1,4 +1,4 @@
-npm<template>
+<template>
   <div class="page-container">
     <div class="hero-container">
       <div class="content-wrapper">
@@ -149,7 +149,7 @@ h1 {
 }
 
 .start-btn:hover {
-  transform: translateY(-0.10vw);
+  transform: translateY(-0.3vh);
   box-shadow: 0 0.31vw 0.83vw rgba(0, 0, 0, 0.15);
 }
 
@@ -165,8 +165,13 @@ h1 {
   background: white;
   border-radius: 1.04vw;
   padding: 2.08vw;
+  transition: all 0.4s;
   text-align: center;
   box-shadow: 0 0.21vw 0.63vw rgba(0, 0, 0, 0.1);
+  &:hover {
+    transform: translateY(-0.80vh);
+    box-shadow: 0 0.4vw 0.73vw rgba(0, 0, 0, 0.15);
+  }
 }
 
 .feature-card .icon-box {
@@ -214,6 +219,11 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.1s;
+  &:hover {
+    transform: scale(1.5);
+    box-shadow: 0 0.4vw 0.73vw rgba(0, 0, 0, 0.15);
+  }
 }
 
 .disclaimer-card .icon-box .el-icon {
@@ -318,6 +328,11 @@ h1 {
   background: #007AFF;
   border: 0.21vw solid white;
   box-shadow: 0 0 0 0.10vw #007AFF;
+  transition: all 0.1s;
+  &:hover {
+    transform: scale(1.5);
+    box-shadow: 0 0.25vw 0.73vw rgba(0, 0, 0, 0.15);
+  }
 }
 
 .timeline-item:nth-child(even) .timeline-point {
@@ -326,10 +341,15 @@ h1 {
 }
 
 .timeline-content {
-  background: #f8f9fa;
+  background: #f2f2f2;
   padding: 1.56vw;
   border-radius: 0.52vw;
   box-shadow: 0 0.10vw 0.42vw rgba(0, 0, 0, 0.05);
+  transition: all 0.4s;
+  &:hover {
+    transform: translateY(-0.70vh);
+    box-shadow: 0 0.3vw 0.63vw rgba(0, 0, 0, 0.10);
+  }
 }
 
 .timeline-content .date {

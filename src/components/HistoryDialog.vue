@@ -131,6 +131,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
 
+
   h3 {
     margin: 0;
     font-size: 18px;
@@ -144,9 +145,10 @@ onMounted(() => {
     cursor: pointer;
     padding: 8px;
     border-radius: 6px;
-    
+    transition: all 0.2s;
     &:hover {
-      background: #f3f4f6;
+      box-shadow: 0 0 0.63vw rgba(0, 0, 0, 0.10);
+      background: #f1f1f1;
     }
   }
 }
@@ -166,15 +168,16 @@ onMounted(() => {
     cursor: pointer;
     display: flex;
     align-items: center;
-    transition: all 0.3s ease;
-
+    transition: all 0.3s;
     &:hover {
+      transform: translateY(-0.30vh);
+      box-shadow: 0 0.3vw 0.63vw rgba(0, 0, 0, 0.10);
       background: #f3f4f6;
     }
-
     .history-info {
       flex: 1;
       margin-right: 12px;
+
 
       .history-title {
         color: #111827;
@@ -211,9 +214,15 @@ onMounted(() => {
     color: #374151;
     cursor: pointer;
     font-size: 14px;
-    
+
+
     &:hover:not(:disabled) {
       background: #f3f4f6;
+      transition: all 0.3s;
+      &:hover {
+        transform: translateY(-0.10vh);
+        box-shadow: 0 0.3vw 0.53vw rgba(0, 0, 0, 0.10);
+      }
     }
 
     &:disabled {

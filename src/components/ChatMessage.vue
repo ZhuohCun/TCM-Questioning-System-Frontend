@@ -109,11 +109,16 @@ const formatTime = (time) => {
   border-radius: 12px;
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+  &:hover {
+    box-shadow: 0 0 1.2vw rgba(0, 0, 0, 0.10);
+  }
 }
 
 .message-user .message-content {
   background: #e3f2fd;
   color: #374151;
+
 }
 
 .message-time {
@@ -127,6 +132,7 @@ const formatTime = (time) => {
   font-size: 14px;
   line-height: 1.6;
   background: transparent !important;
+
 }
 
 /* 代码块样式 */

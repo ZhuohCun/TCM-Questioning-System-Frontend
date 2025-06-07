@@ -114,7 +114,10 @@ const handleLogin = async () => {
   border: 0.10vw solid #ddd;
   border-radius: 0.31vw;
   font-size: 1.04vw;
-  transition: border-color 0.3s;
+  transition: all 0.2s;
+  &:hover {
+    box-shadow: 0 0 0.9vw rgba(0, 0, 0, 0.10);
+  }
 }
 
 .login-form .form-group input:focus {
@@ -131,7 +134,11 @@ const handleLogin = async () => {
   border-radius: 0.31vw;
   font-size: 1.04vw;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s;
+  &:hover {
+    transform: translateY(-0.30vh);
+    box-shadow: 0 0.3vw 0.63vw rgba(0, 0, 0, 0.10);
+  }
 }
 
 .submit-btn:hover {
@@ -152,6 +159,10 @@ const handleLogin = async () => {
 .register-link a {
   color: #007AFF;
   text-decoration: none;
+  transition: all 0.2s;
+  &:hover {
+    box-shadow: 0 0 0.63vw rgba(0, 0, 0, 0.10);
+  }
 }
 
 .register-link a:hover {

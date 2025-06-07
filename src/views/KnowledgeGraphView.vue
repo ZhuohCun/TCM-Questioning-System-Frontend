@@ -12,6 +12,9 @@
 
 <script>
 import { Network } from 'vis-network/standalone/esm/vis-network';
+import {api} from "@/api/index.js";
+import {ElMessage} from "element-plus";
+import token from "markdown-it/lib/token.mjs";
 
 export default {
   data() {
@@ -22,8 +25,27 @@ export default {
       loading: true // 加载状态
     };
   },
-  mounted() {
-    this.fetchGraphData();
+  async mounted() {
+    var token=localStorage.getItem('token');
+    if (!token) {
+      ElMessage.warning('请先登录')
+      await router.push('/login')
+      return
+    }else {
+      try{
+        var status = await api.getLoginStatus()
+      }catch (error) {
+        status.data="-1";
+      }
+      if (status.data != "1") {
+        ElMessage.warning('请先登录')
+        router.push('/login')
+        return
+      } else {
+        this.fetchGraphData();
+      }
+    }
+
   },
   methods: {
     async fetchGraphData() {
@@ -186,12 +208,19 @@ export default {
   width: 100%;
   max-width: none;
   position: relative;
+  overflow: hidden;
 }
 
 #network {
   width: 100%;
-  height: 90.28vh; /* 650px ≈ 90.28vh (基于720px高的视窗) */
+  height: 90vh;
   border: 0.14vh solid lightgray;
+  transition: all 0.2s;
+  border-radius: 0.8vw;
+  overflow: hidden;
+  &:hover {
+    box-shadow: 0 0 1vw rgba(0, 0, 0, 0.10);
+  }
 }
 
 .popup {
@@ -203,7 +232,11 @@ export default {
   width: 27.78vw; /* 200px ≈ 27.78vw (基于720px宽的视窗) */
   min-height: auto;
   height: 20.83vh; /* 150px ≈ 20.83vh */
-  overflow: auto;
+  transition: all 0.2s;
+  overflow: hidden;
+  &:hover {
+    box-shadow: 0 0 1vw rgba(0, 0, 0, 0.10);
+  }
 }
 
 .loading {
@@ -214,9 +247,13 @@ export default {
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 1.39vh 2.78vw; /* 10px 20px */
-  border-radius: 0.69vh; /* 5px */
+  border-radius: 0.71vh; /* 5px */
   font-size: 2.22vh; /* 16px */
   z-index: 1000;
+  transition: all 0.2s;
+  &:hover {
+    box-shadow: 0 0 1vw rgba(0, 0, 0, 0.10);
+  }
 }
 
 </style>

@@ -86,7 +86,6 @@ const loading = ref(false)
 const messages = ref([])
 const currentInfo = ref(null)
 const isHistoryOpen = ref(false)
-const chatHistory = ref([]) // 这里需要从API获取历史记录
 
 // 添加模型选择相关的状态
 const currentModel = ref('normal') // 'normal' 或 'stream'
@@ -107,28 +106,6 @@ const scrollToBottom = async () => {
     messagesRef.value.scrollTop = messagesRef.value.scrollHeight
   }
 }
-
-// 检查文中的穴位名称并获取信息
-const checkAcupoints = async (text) => {
-  // 这里需要一个穴位名称的正则表达式匹配
-  // 这是一个简单的示例，实际应用中可能需要更复杂的匹配规则
-  const acupointPattern = /[a-zA-Z\u4e00-\u9fa5]+穴/g
-  const matches = text.match(acupointPattern)
-  
-  if (matches) {
-    try {
-      const res = await api.getMeridianInfo({
-        MeridianName: matches[0].replace('穴', '')
-      })
-      if (res.data && res.data.length > 0) {
-        currentInfo.value = res.data[0]
-      }
-    } catch (error) {
-      console.error('获取穴位信息失败:', error)
-    }
-  }
-}
-
 // 发送消息
 const sendMessage = async () => {
   if (loading.value || !inputMessage.value.trim()) return
@@ -147,8 +124,6 @@ const sendMessage = async () => {
   
   try {
     loading.value = true
-    
-    // 创建一个空的 AI 回复消息
     const botMessage = {
       content: '',
       isUser: false,
@@ -202,13 +177,6 @@ const newDialog = async () => {
 const toggleHistory = () => {
   isHistoryOpen.value = !isHistoryOpen.value
 }
-
-// 格式化时间
-const formatTime = (time) => {
-  return new Date(time).toLocaleString()
-}
-
-// 加载历史话
 const loadHistory = async (historyData) => {
   try {
     historyData.forEach((item) => {
@@ -245,10 +213,24 @@ onMounted(async () => {
   if (inputRef.value) {
     inputRef.value.focus()
   }
-  await newDialog();
-  if (!localStorage.getItem('token')) {
+  let token=localStorage.getItem("token")
+  if(!token){
     ElMessage.warning('请先登录')
     router.push('/login')
+    return
+  }else {
+    try{
+      var status = await api.getLoginStatus()
+    }catch (error) {
+      status.data="-1";
+    }
+    if (status.data!="1") {
+      ElMessage.warning('请先登录')
+      router.push('/login')
+      return
+    }else {
+      await newDialog();
+    }
   }
 })
 
@@ -308,6 +290,7 @@ onBeforeUnmount(() => {
     background-color: rgba(156, 163, 175, 0.5);
     border-radius: 0.16vw;
 
+
     &:hover {
       background-color: rgba(156, 163, 175, 0.8);
     }
@@ -358,7 +341,7 @@ onBeforeUnmount(() => {
 
       &:hover {
         background: #374151;
-        transform: translateY(-0.09vh);
+        transform: translateY(-0.1vh);
       }
 
       i {
@@ -377,7 +360,10 @@ onBeforeUnmount(() => {
       font-size: 1.3vh;
       line-height: 1.5;
       background: #f8f9fa;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
+      &:hover {
+        box-shadow: 0 0 0.9vw rgba(0, 0, 0, 0.10);
+      }
 
       &:focus {
         outline: none;
@@ -405,7 +391,7 @@ onBeforeUnmount(() => {
 
       &:hover {
         background: #2563eb;
-        transform: translateY(-0.09vh);
+        transform: translateY(-0.1vh);
       }
 
       &:disabled {
@@ -473,9 +459,11 @@ onBeforeUnmount(() => {
   height: calc(100vh - 9vh);
   background: white;
   box-shadow: 0.1vw 0 0.42vw rgba(0, 0, 0, 0.1);
-  transition: left 0.3s ease;
   z-index: 100;
-
+  transition: all 0.2s;
+  &:hover {
+    box-shadow: 0 0 1vw rgba(0, 0, 0, 0.10);
+  }
   &.is-open {
     left: 0;
   }
@@ -542,6 +530,7 @@ onBeforeUnmount(() => {
     margin: 0;
     letter-spacing: 0.05vw;
     line-height: 1.5;
+    cursor: default;
   }
 }
 
@@ -549,9 +538,9 @@ onBeforeUnmount(() => {
   position: fixed;
   top: 6.48vh;
   left: 1.04vw;
+  border-radius: 0.6vw;
   z-index: 100;
 }
-
 .model-button {
   position: fixed;
   top:10vh;
@@ -568,12 +557,12 @@ onBeforeUnmount(() => {
   color: #374151;
   box-shadow: 0 0.19vh 0.37vh rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
-
   &:hover {
+    transform: translateY(-0.1vh);
+    box-shadow: 0 0 1vw rgba(0, 0, 0, 0.10);
     background: #f9fafb;
     border-color: #d1d5db;
   }
-
   i {
     font-size: 1.11vh;
     margin-left: 0.21vw;

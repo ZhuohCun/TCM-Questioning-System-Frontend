@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import store from '../store'
 import KnowledgeGraphView from '../views/KnowledgeGraphView.vue'
+import {api} from "@/api/index.js";
+import {ElMessage} from "element-plus";
 
 const routes = [
   {
@@ -56,16 +58,28 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
-  const isLoggedIn = store.state.isLoggedIn
-
-  // 需要认证的页面
-  if (to.path!="/login" && to.path!="/register" && to.path!="/") {
+router.beforeEach(async (to, from, next) => {
+  let isLoggedIn=false
+  if (localStorage.token) {
+    try{
+      var status = await api.getLoginStatus()
+    }catch (error) {
+      status.data="-1";
+    }
+    if (status.data=="1") {
+      isLoggedIn=true
+    }else {
+      isLoggedIn=false
+    }
+  }else {
+    isLoggedIn=false
+  }
+  if (to.path != "/login" && to.path != "/register" && to.path != "/") {
     if (!isLoggedIn) {
       // 未登录，跳转到登录页
       next({
         path: '/login',
-        query: { redirect: to.fullPath }
+        query: {redirect: to.fullPath}
       })
     } else {
       next()
@@ -73,7 +87,7 @@ router.beforeEach((to, from, next) => {
   } else {
     // 已登录用户访问登录/注册页面时重定向到首页
     if (isLoggedIn && (to.path === '/login' || to.path === '/register')) {
-      next({ path: '/' })
+      next({path: '/'})
     } else {
       next()
     }

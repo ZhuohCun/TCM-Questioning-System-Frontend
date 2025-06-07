@@ -2,8 +2,8 @@
   <div class="acupoint-container">
     <!-- 左侧经络列表 -->
     <div class="meridian-list">
-      <div 
-        v-for="meridian in meridians" 
+      <div
+        v-for="meridian in meridians"
         :key="meridian"
         class="meridian-item"
         :class="{ active: currentMeridian === meridian }"
@@ -19,43 +19,44 @@
       <el-empty v-if="loading" description="加载中...">
         <el-icon class="loading"><Loading /></el-icon>
       </el-empty>
-      
+
       <!-- 添加空状态 -->
-      <el-empty 
-        v-else-if="!loading && (!currentAcupoints || currentAcupoints.length === 0)" 
+      <el-empty
+        v-else-if="!loading && (!currentAcupoints || currentAcupoints.length === 0)"
         description="暂无数据"
       />
-
-      <div v-else class="acupoint-grid">
-        <div 
-          v-for="acupoint in currentAcupoints"
-          :key="acupoint.id" 
-          class="acupoint-card"
-          @click="toggleAcupointDetail(acupoint.name)"
+      <div class="acupoint-grid">
+        <div
+            v-for="acupoint in currentAcupoints"
+            :key="acupoint.id"
+            class="acupoint-card"
+            @click="toggleAcupointDetail(acupoint.name)"
         >
-          <!-- 简略信息卡片 -->
           <div class="card-header">
             <h3>{{ acupoint.name }}</h3>
-            <span class="meridian-tag">{{ acupoint.meridian_name }}</span>
+            <span>{{ acupoint.meridian_name }}</span>
           </div>
-          
-          <!-- 详细信息卡片(只在点击后显示) -->
-          <div v-if="expandedAcupoint === acupoint.name" class="card-detail">
-            <div v-if="acupointDetails[acupoint.name]" class="detail-content">
-              <div class="detail-item">
-                <label>位置：</label>
+          <transition
+              @before-enter="beforeEnter"
+              @enter="enter"
+              @after-enter="afterEnter"
+              @before-leave="beforeLeave"
+              @leave="leave"
+              @after-leave="afterLeave"
+          >
+            <div
+                v-show="expandedAcupoint === acupoint.name"
+                class="card-detail"
+                ref="detailRefs"
+                :ref="el => setDetailRef(el, acupoint.name)"
+            >
+              <div v-if="acupointDetails[acupoint.name]" class="detail-content">
                 <p>{{ acupointDetails[acupoint.name].location_description }}</p>
-              </div>
-              <div class="detail-item">
-                <label>操作方法：</label>
                 <p>{{ acupointDetails[acupoint.name].technique }}</p>
               </div>
+              <div v-else class="loading-detail">加载中…</div>
             </div>
-            <div v-else class="loading-detail">
-              <el-icon class="loading"><Loading /></el-icon>
-              加载中...
-            </div>
-          </div>
+          </transition>
         </div>
       </div>
     </div>
@@ -124,13 +125,13 @@ const toggleAcupointDetail = async (name) => {
     expandedAcupoint.value = null // 如果已经展开则收起
     return
   }
-  
+
   expandedAcupoint.value = name // 展开新的穴位
-  
+
   // 如果还没有加载详情则加载
   if (!acupointDetails.value[name]) {
     try {
-      const res = await api.getMeridianInfo({ 
+      const res = await api.getMeridianInfo({
         MeridianName: name
       })
       if (res.data && res.data.length > 0) {
@@ -149,22 +150,34 @@ const fetchAllAcupoints = async () => {
   loading.value = true
   try {
     // 检查是否已登录
-    if (!localStorage.getItem('token')) {
+    var token=localStorage.getItem('token')
+    if(!token){
       ElMessage.warning('请先登录')
       router.push('/login')
       return
+    }else {
+      try{
+        var status = await api.getLoginStatus()
+      }catch (error) {
+        status.data="-1";
+      }
+      if (status.data!="1") {
+        ElMessage.warning('请先登录')
+        router.push('/login')
+        return
+      }
     }
     const res = await api.getMeridianList()
     if (res.data) {
       allAcupoints.value = res.data
       console.log('设置到 allAcupoints 的数据:', allAcupoints.value)
-      
+
       // 默认选中第一个有穴位数据的经络
-      const firstMeridian = meridians.find(m => 
-        res.data.some(item => item.meridian_id === m)
+      const firstMeridian = meridians.find(m =>
+        res.data.some(item => item.meridian_name === m)
       )
       console.log('找到的第一个经络:', firstMeridian)
-      
+
       if (firstMeridian) {
         currentMeridian.value = firstMeridian
         console.log('设置当前经络为:', currentMeridian.value)
@@ -182,10 +195,55 @@ const fetchAllAcupoints = async () => {
     loading.value = false
   }
 }
-
 onMounted(() => {
   fetchAllAcupoints()
 })
+function beforeEnter(el) {
+  el.style.maxHeight = '0'
+  el.style.transform = 'scaleY(0.8)'
+  el.style.transformOrigin = 'top'
+  el.style.overflow = 'hidden'
+  el.style.transition = 'none'
+}
+
+function enter(el) {
+  requestAnimationFrame(() => {
+    el.style.transition = 'max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+    el.style.maxHeight = el.scrollHeight + 50 + 'px' // 多留点空间避免裁剪
+    el.style.transform = 'scaleY(1)'
+  })
+}
+
+function afterEnter(el) {
+  el.style.maxHeight = 'none'
+  el.style.overflow = ''
+  el.style.transition = ''
+  el.style.transform = ''
+}
+
+function beforeLeave(el) {
+  el.style.maxHeight = el.scrollHeight + 'px'
+  el.style.transform = 'scaleY(1)'
+  el.style.transformOrigin = 'top'
+  el.style.overflow = 'hidden'
+  el.style.transition = 'none'
+  el.offsetHeight
+}
+
+function leave(el) {
+  requestAnimationFrame(() => {
+    el.style.transition = 'max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+    el.style.maxHeight = '0'
+    el.style.transform = 'scaleY(0.8)'
+  })
+}
+
+function afterLeave(el) {
+  el.style.transition = ''
+  el.style.maxHeight = ''
+  el.style.transform = ''
+  el.style.overflow = ''
+}
 </script>
 
 <style scoped lang="scss">
@@ -230,11 +288,12 @@ onMounted(() => {
     min-width: 8vw;
     min-height: 5vh;
     justify-content: center;
-
+    border-radius: 0.6vw;
     &:hover {
+      transform: translateY(-0.30vh);
+      box-shadow: 0 0.3vw 0.63vw rgba(0, 0, 0, 0.10);
       background: #f3f4f6;
     }
-
     &.active {
       background: #e3f2fd;
       color: #1976d2;
@@ -265,11 +324,11 @@ onMounted(() => {
   height: auto;
   flex-direction: row;
   flex-wrap: wrap;
-  column-gap: 1vw;
-  row-gap: 1vw;
-  padding: 0 1vw;
+  column-gap: 3vw;
+  padding:0 2vh;
   justify-content: center;
   align-items: flex-start;
+  row-gap: 3vh;
   z-index: 0;
 }
 
@@ -277,17 +336,18 @@ onMounted(() => {
   background: white;
   display: flex;
   flex-direction: column;
-  border-radius: 0.42vw;
+  border-radius: 0.6vw;
   box-shadow: 0 0.10vw 0.42vw rgba(0, 0, 0, 0.08);
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s;
   border: 0.05vw solid #eee;
   min-width: 15vw;
+  max-width: 15vw;
   min-height: 11vh;
 
   &:hover {
-    transform: translateY(-0.10vw);
+    transform: translateY(-0.40vh);
     box-shadow: 0 0.21vw 0.63vw rgba(0, 0, 0, 0.12);
   }
 
@@ -303,7 +363,9 @@ onMounted(() => {
       font-weight: 700;
       color: #000;
     }
-
+    span{
+      font-size: 0.73vw;
+    }
     .meridian-tag {
       font-size: 0.68vw;
       color: #666;
@@ -317,6 +379,11 @@ onMounted(() => {
   .card-detail {
     padding: 1.04vw;
     background: white;
+    overflow: hidden;
+    transition: all 0.5s;
+    transform-origin: top center;
+    border-radius: 0 0 4px 4px;
+    will-change: max-height, opacity, transform;
 
     .detail-content {
       .detail-item {
@@ -351,9 +418,14 @@ onMounted(() => {
       color: #666;
       padding: 1.04vw 0;
 
+
       .loading {
         font-size: 1.04vw;
         color: #333;
+        transition: all 0.2s;
+        &:hover {
+          box-shadow: 0 0 0.8vw rgba(0, 0, 0, 0.10);
+        }
       }
     }
   }
@@ -374,7 +446,6 @@ onMounted(() => {
     margin-bottom: 1.04vw;
     box-shadow: 0 0.10vw 0.42vw rgba(0, 0, 0, 0.1);
   }
-
   .acupoint-content {
     margin-left: 0;
     width: 100%;
@@ -386,13 +457,6 @@ onMounted(() => {
     padding: 0;
   }
 }
-
-// 加载状态样式
-.loading {
-  font-size: 1.25vw;
-  animation: rotate 1s linear infinite;
-}
-
 @keyframes rotate {
   from {
     transform: rotate(0deg);
@@ -402,4 +466,4 @@ onMounted(() => {
   }
 }
 
-</style> 
+</style>

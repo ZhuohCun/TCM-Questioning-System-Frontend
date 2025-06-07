@@ -28,22 +28,37 @@
 import { onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import {api} from "@/api/index.js";
 
 const store = useStore()
 const router = useRouter()
 
-onMounted(() => {
-  // 检查本地存储的token
+onMounted(async () => {
   const token = localStorage.getItem('token')
-  if (token) {
-    store.commit('setToken', token)
-    store.commit('setLoggedIn', true)
+  if (token==null) {
+    onlyhandleLogout()
+  }else {
+    try{
+      var status = await api.getLoginStatus()
+      if (status.data == "1" && token) {
+        store.commit('setToken', token)
+        store.commit('setLoggedIn', true)
+      }else {
+        onlyhandleLogout()
+      }
+    }catch (error) {
+      onlyhandleLogout()
+    }
   }
 })
-
 const handleLogout = () => {
   store.commit('logout')
   router.push('/login')
+}
+const onlyhandleLogout = () => {
+  localStorage.removeItem('token')
+  store.commit('logout')
+  router.push('/')
 }
 </script>
 
@@ -86,8 +101,12 @@ const handleLogout = () => {
   color: #2c3e50;
   font-weight: 500;
   padding: 1.04vh 1.67vw;
-  border-radius: 0.21vw;
-  transition: all 0.3s ease;
+  border-radius: 0.6vw;
+  transition: all 0.3s;
+  &:hover {
+    transform: translateY(-0.30vh);
+    box-shadow: 0 0.3vw 0.63vw rgba(0, 0, 0, 0.10);
+  }
 }
 
 .nav-link:hover,
