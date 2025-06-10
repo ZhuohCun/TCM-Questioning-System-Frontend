@@ -49,7 +49,7 @@ export const api = {
   // 发送问题 (自研agent)
   sendQuestion: (data) => {
     const token = localStorage.getItem('token');
-    return fetch(`${BASE_URL}/user/chatString?question=${encodeURIComponent(data.question)}`, {
+    return fetch(`${BASE_URL}/user/chatString?question=${encodeURIComponent(data.question)}&sequence=${encodeURIComponent(data.sequence)}`, {
       method: 'GET',
       headers: {
         'Authorization': token
@@ -74,10 +74,6 @@ export const api = {
     return request({
       url: `${BASE_URL}/HistoricalDialogueInfo/getList`,
       method: 'get',
-      params: {
-        pageId: data.pageId,
-        count: data.count
-      },
       headers: {
         authorization: localStorage.getItem('token')
       }
@@ -116,12 +112,6 @@ export const api = {
     })
   },
 
-  // 获取历史对话列表
-  getHistoryDialogs: () => request.get('/api/chat/history'),
-
-  // 获取特定历史对话内容
-  getHistoryDialog: (id) => request.get(`/api/chat/history/${id}`),
-
   // 获取所有穴位列表
   getMeridianList: () => {
     return request({
@@ -140,5 +130,5 @@ export const api = {
         authorization: localStorage.getItem('token')
       }
     })
-  }
+  },
 } 

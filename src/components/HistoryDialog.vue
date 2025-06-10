@@ -47,6 +47,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { api } from '@/api'
+import {forEach} from "lodash-es";
 
 const props = defineProps({
   visible: Boolean
@@ -56,7 +57,8 @@ const emit = defineEmits(['update:visible', 'select'])
 
 const historyList = ref([])
 const currentPage = ref(1)
-const pageSize = 10
+const pageSize = 7
+const allHistory = ref([])
 const totalPages = ref(1)
 
 // 格式化日期
@@ -64,21 +66,25 @@ const formatDate = (dateStr) => {
   const date = new Date(dateStr)
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }
-
 // 获取历史记录
 const fetchHistory = async () => {
   try {
-    const res = await api.getHistoryList({
-      pageId: currentPage.value,
-      count: pageSize
-    })
+    const res = await api.getHistoryList()
     if (res.data && Array.isArray(res.data)) {
-      historyList.value = res.data
-      totalPages.value = Math.max(Math.ceil(res.data.length / pageSize), 1)
+      allHistory.value = res.data
+      totalPages.value = Math.max(Math.ceil(allHistory.value.length / pageSize), 1)
+      updateCurrentPage()
     }
   } catch (error) {
     console.error('获取历史记录失败:', error)
   }
+}
+
+// 更新当前页显示的数据
+const updateCurrentPage = () => {
+  const start = (currentPage.value - 1) * pageSize
+  const end = start + pageSize
+  historyList.value = allHistory.value.slice(start, end)
 }
 
 // 查看历史对话
@@ -98,7 +104,7 @@ const viewHistory = async (item) => {
 const changePage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
-    fetchHistory()
+    updateCurrentPage()
   }
 }
 

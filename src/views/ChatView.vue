@@ -73,9 +73,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch, onBeforeUnmount } from 'vue'
+import {nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import ChatMessage from '@/components/ChatMessage.vue'
-import { api } from '@/api'
+import {api} from '@/api'
 import HistoryDialog from '@/components/HistoryDialog.vue'
 import {ElMessage} from "element-plus";
 
@@ -83,33 +83,28 @@ const messagesRef = ref(null)
 const inputRef = ref(null)
 const inputMessage = ref('')
 const loading = ref(false)
-const messages = ref([])
+let messages = ref([])
 const currentInfo = ref(null)
 const isHistoryOpen = ref(false)
+let currentSequence=0
 
-// 添加模型选择相关的状态
-const currentModel = ref('normal') // 'normal' 或 'stream'
 let currentEventSource = null
-
-// 处理模型切换
-const handleModelChange = async (model) => {
-  if (model === currentModel.value) return
-  currentModel.value = model
-  // 新建对话
-  await newDialog()
-}
-
 // 自动滚动到底部
 const scrollToBottom = async () => {
   await nextTick()
   if (messagesRef.value) {
-    messagesRef.value.scrollTop = messagesRef.value.scrollHeight
+    messagesRef.value.scrollTo({
+      top: messagesRef.value.scrollHeight,
+      behavior: 'smooth' // 启用平滑滚动动画
+    })
   }
 }
 // 发送消息
 const sendMessage = async () => {
   if (loading.value || !inputMessage.value.trim()) return
-  
+  if(isHistoryOpen.value==1){
+    toggleHistory();
+  }
   const userMessage = {
     content: inputMessage.value,
     isUser: true,
@@ -134,8 +129,7 @@ const sendMessage = async () => {
     messages.value.push(botMessage)
       try {
         loading.value = true
-        // 使用流式接口
-        const response = await api.sendQuestion({ question: messageText })
+        const response = await api.sendQuestion({ question: messageText,sequence: currentSequence })
         const reader = response.body.getReader()
         const decoder = new TextDecoder()
 
@@ -168,6 +162,10 @@ const newDialog = async () => {
     await api.newDialogue()
     messages.value = []
     currentInfo.value = null
+    currentSequence=-1;
+    if(isHistoryOpen.value==1){
+      toggleHistory();
+    }
   } catch (error) {
     alert(error.message || '新建对话失败')
   }
@@ -179,7 +177,9 @@ const toggleHistory = () => {
 }
 const loadHistory = async (historyData) => {
   try {
+    messages.value=[]
     historyData.forEach((item) => {
+      currentSequence=item.sequence_id;
       const userMessage = {
         content: item.question,
         isUser: true,
@@ -195,7 +195,8 @@ const loadHistory = async (historyData) => {
       }
       messages.value.push(botMessage)
     });
-    scrollToBottom()
+    await scrollToBottom();
+    await scrollToBottom();
   } catch (error) {
     console.error('加载历史对话失败:', error)
   }
@@ -275,6 +276,11 @@ onBeforeUnmount(() => {
   width: 100%;
   max-width: 41.67vw;
   margin: 0 auto;
+  max-height: 80vh; /* 按需调整 */
+  scroll-behavior: smooth;
+  transform: translateZ(0); /* 强制GPU合成 */
+  will-change: scroll-position;
+  backface-visibility: hidden;
 
   > div {
     max-width: 85%;
